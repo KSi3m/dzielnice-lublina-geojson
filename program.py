@@ -1,6 +1,7 @@
 import requests
 import json
 import urllib
+import os
 
 headers = {
         'User-Agent': 'MyApp/1.0 (contact@example.com)', 
@@ -38,12 +39,15 @@ def get_geojson_data(headers,osm_id):
         print(f'Błąd: {response.status_code}')
         return None
 
-with open('dzielnice.txt','r',encoding='utf-8') as names:
-    names_list = names.read().split(',')
-    names_list = [name.strip() for name in names_list]
-    city = names_list[0]
-    category = names_list[1]
-    for name in names_list[2::]:
+with open('dzielnice.json','r',encoding='utf-8') as names:
+    data = json.load(names)
+
+    city = data.get('city', '')
+    category = data.get('category', '')
+    
+    names_list = data.get('names', [])
+    
+    for name in names_list:
         osm_id = send_get_for_osm_id(headers,name,city,category)
         if(osm_id == 0):
             print(f" failure: {name}")
@@ -56,7 +60,10 @@ with open('dzielnice.txt','r',encoding='utf-8') as names:
         print(f"success: {name}")
         
     
-        file_path = f'{name.replace(" ", "_").lower()}.geojson'
+        file_path = f'./districts/{name.replace(" ", "_").lower()}.geojson'
+        
+        if not os.path.exists('./districts'):
+            os.makedirs('./districts')
 
         with open(file_path, 'w', encoding='utf-8') as file:
             json.dump(geodata_for_district, file, ensure_ascii=False, indent=4)
