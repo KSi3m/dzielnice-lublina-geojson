@@ -21,12 +21,14 @@ def send_get_for_osm_id(headers,search_parameter,city,category):
             for entry in data:
                 if city in entry['display_name'] and category in entry['category']:
                     osm_id = entry['osm_id']
-        else:
+        elif(len(data) == 1):
             osm_id = data[0]['osm_id']
+        else:
+            osm_id = None
         return osm_id
     else:
         print(f'Błąd: {response.status_code}')
-        return 0
+        return None
         
 def get_geojson_data(headers,osm_id):
     url = f'https://polygons.openstreetmap.fr/get_geojson.py?id={osm_id}&params=0'
@@ -49,7 +51,7 @@ with open('dzielnice.json','r',encoding='utf-8') as names:
     
     for name in names_list:
         osm_id = send_get_for_osm_id(headers,name,city,category)
-        if(osm_id == 0):
+        if(osm_id == None):
             print(f" failure: {name}")
             
             continue
