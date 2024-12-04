@@ -44,7 +44,7 @@ with open('dzielnice.txt','r',encoding='utf-8') as names:
     city = names_list[0]
     category = names_list[1]
     for name in names_list[2::]:
-        osm_id = send_get_for_osm_id(headers,name,'Lublin','boundary')
+        osm_id = send_get_for_osm_id(headers,name,city,category)
         if(osm_id == 0):
             print(f" failure: {name}")
             
